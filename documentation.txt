@@ -1,0 +1,63 @@
+Documentation for DataFrames Library
+------------------------------------
+The dataframe.py file implements an implementation of a DataFrame and Series data with increased 
+type safety and more predictable behaviour with None's compared to other existing libraries such 
+as pandas.
+
+The underlying operations are written only using Python lists - this makes the code readable and reduces
+dependencies. However, this means the code may be much slower in certain cases than other libraries such
+as pandas which utilise numpy for efficient vectorised compiled code.
+
+This code was tested on Python 3.14.
+------------------------------------
+
+Series(Generic[T])
+    The class Series(Generic[T]) defines a base class with shared functionality across all series.
+    This class is never used directly, but it is the parent of all other Series classes which get used.
+    The Generic[T] is to allow for specific type annotations. The init method takes in as arguments the list 
+    of values, as well as the expected type. Then, a type check is performed and the list as well as this base 
+    type are stored.
+
+    The __getitem__ method overrides the square bracket operator, allowing for access via either an integer,
+    or a Boolean Series. If given a Boolean series, only values where the Boolean Series is True are kept. Note, 
+    the type of SeriesBool is as a string as it has not yet been defined (this pattern appears a number of times).
+
+    The override_operation function provides a function which is used to override operations such as inequalities,
+    arithmetic, and logical operators. Taking as input the other series or item to apply the operation with, the operation,
+    and the return type (defaulted to be assumed the same type as the series) the result of the operation is returned. None
+    values are automatically propagated, but this is a design choice and can easily be altered. There is also a helper function 
+    to return Series of the correct type.
+
+    Then, an equality operation is implemented for all series via __eq__ performing element-wise equality to return a SeriesBool.
+
+    Finally, a string representation is provided for printing and debugging.
+
+SeriesBool(Series[bool])
+    Inheriting from the Series class, this class provides Series for booleans. The initialisation is performed solely by inputting
+    the list of values. We also override logical operators and, or, xor and invert for these series.
+
+SeriesStr(Series[str])
+    Similarly to above, this class implements Series for strings. Again, it inherits from its parent class, and no additional methods 
+    are defined.
+
+SeriesNum(Series[T])
+    This class implements overrides for arithmetic operations and inequalities (which need to be defined for both integers and floats).
+    Using numpy arrays here would lead to a great advantage if considering memory and time efficiency. For division, a division by zero 
+    results in a None rather than an exception being raised.
+
+SeriesInt(SeriesNum[int]) and SeriesInt(SeriesNum[float])
+    Both inherit from the SeriesNum class, only redefining the __init__ method to solely require a list input.
+
+DataFrame
+    Implements a DatatFrame which is constructed via passing a dictionary containing column names and series. The necessary type checks and size
+    checks are performed at creation. A string representation is provided for ease of printing and debugging. The square bracket operator is overridden
+    to allow integer and SeriesBool indexing access. The SeriesBool access uses the already implemented version for Series on each column of the 
+    DataFrame.
+
+Performance
+    Inherently, using Python loops and even list comprehensions are slow. This is due to a number of reasons - for example, loops are run by the Python interpreter 
+    at run time which needs to do additional operations such as parse the code, create a stack frame, etc. which takes time. Even though comprehensions reduce the number 
+    of bytecode instructions, there are still more efficient methods. Vectorised operations with  numpy are very efficient due to optimised compiled code - this leads to 
+    faster and more memory efficient operations. So, numpy operations could be internally used rather than loops and list comprehensions to increase efficiency. However, 
+    firstly numpy achieves this advantage mostly for numeric datatypes (so not strings in our case) and it doesn't behave well with missing values (None). One option would 
+    be to make use of masked arrays from numpy. They naturally propagate missing values (Nones) and these are treated differently to nans as we would like. 
