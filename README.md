@@ -1,11 +1,6 @@
 # DataFrame
 
-The dataframe.py file implements an implementation of a DataFrame and Series data with increased 
-type safety and more predictable behaviour with None's compared to other existing libraries such 
-as pandas.
+The dataframe.py file contains an implementation of DataFrames and Series with increased 
+type safety and control compared to other existing libraries such as pandas.
 
 The test.py file contains various tests for this library.
-
-The underlying operations are written only using Python lists - this makes the code readable and reduces
-dependencies. However, this means the code may be much slower in certain cases than other libraries such
-as pandas which utilise numpy for efficient vectorised compiled code.
